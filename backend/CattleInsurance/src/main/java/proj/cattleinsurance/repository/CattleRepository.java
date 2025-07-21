@@ -10,24 +10,27 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CattleRepository extends JpaRepository<Cattle, Long> {
+public interface CattleRepository extends JpaRepository<Cattle, String> {
     
     // Find cattle by tag number
-    Optional<Cattle> findByTagNumber(String tagNumber);
+    Optional<Cattle> findByCattleTag(String cattleTag);
     
-    // Find cattle by owner ID
-    List<Cattle> findByOwnerId(Long ownerId);
+    // Find cattle by user ID (owner)
+    List<Cattle> findByUserId(Long userId);
     
     // Find cattle by breed
     List<Cattle> findByBreed(String breed);
     
-    // Find cattle by status
-    List<Cattle> findByStatus(String status);
+    // Find cattle by cattle type
+    List<Cattle> findByCattleType(String cattleType);
     
-    // Custom query to find cattle by owner and status
-    @Query("SELECT c FROM Cattle c WHERE c.ownerId = :ownerId AND c.status = :status")
-    List<Cattle> findByOwnerIdAndStatus(@Param("ownerId") Long ownerId, @Param("status") String status);
+    // Find cattle by policy ID
+    List<Cattle> findByPolicyId(Long policyId);
     
-    // Count cattle by owner
-    long countByOwnerId(Long ownerId);
+    // Custom query to find cattle by user and breed
+    @Query("SELECT c FROM Cattle c WHERE c.userId = :userId AND c.breed = :breed")
+    List<Cattle> findByUserIdAndBreed(@Param("userId") Long userId, @Param("breed") String breed);
+    
+    // Count cattle by user
+    long countByUserId(Long userId);
 } 

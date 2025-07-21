@@ -3,7 +3,7 @@ import './LoginPage.css';
 
 const LoginPage = ({ onSwitchToSignup, onLogin }) => {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [errors, setErrors] = useState({});
@@ -27,16 +27,12 @@ const LoginPage = ({ onSwitchToSignup, onLogin }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    if (!formData.username) {
+      newErrors.username = 'Username is required';
     }
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     
     setErrors(newErrors);
@@ -53,18 +49,31 @@ const LoginPage = ({ onSwitchToSignup, onLogin }) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Make API call to backend
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
       
-      // Here you would typically make an API call to your backend
-      console.log('Login attempt:', formData);
+      const data = await response.json();
       
-      // For demo purposes, show success and call onLogin
-      alert('Login successful! Redirecting to dashboard...');
-      
-      // Call the onLogin callback to authenticate the user
-      if (onLogin) {
-        onLogin();
+      if (data.success) {
+        // Store user info in localStorage
+        localStorage.setItem('user', JSON.stringify({
+          username: data.username,
+          role: data.role,
+          userId: data.userId
+        }));
+        
+        // Call the onLogin callback to authenticate the user
+        if (onLogin) {
+          onLogin(data);
+        }
+      } else {
+        setErrors({ general: data.message || 'Login failed. Please try again.' });
       }
       
     } catch (error) {
@@ -96,18 +105,18 @@ const LoginPage = ({ onSwitchToSignup, onLogin }) => {
           )}
           
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="username">Username</label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
-              className={errors.email ? 'error' : ''}
-              placeholder="Enter your email"
+              className={errors.username ? 'error' : ''}
+              placeholder="Enter your username"
               disabled={isLoading}
             />
-            {errors.email && <span className="error-text">{errors.email}</span>}
+            {errors.username && <span className="error-text">{errors.username}</span>}
           </div>
           
           <div className="form-group">

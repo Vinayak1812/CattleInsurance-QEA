@@ -1,65 +1,185 @@
-# Cattle Insurance Web APP
+# Cattle Insurance Management System
 
-This Repo is for Docs and Scope regarding this project.
+A comprehensive cattle insurance management system with role-based access control for farmers, junior admins, and senior admins.
 
-Feature : Capture Photo of Cattle Purpose : Enable users to capture and upload images of individual cattle for identification, health tracking, and insurance claim support. 
-Technical Overview: 
-Reference :
-Resource : https://www.tpointtech.com/image-processing-in-java-face-detection 
-Future Enhancements:
+## Features
 
+### 🔐 Authentication System
+- **Farmer Login**: Regular user authentication
+- **Junior Admin Login**: Username: `juniorAdmin`, Password: `Junior@12345`
+- **Senior Admin Login**: Username: `seniorAdmin`, Password: `Senior@12345`
 
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+### 👨‍🌾 Farmer Dashboard
+- View insurance policies
+- Manage cattle information
+- Apply for new insurance policies
+- File claims
+- View notifications
 
+### 👨‍💼 Junior Admin Dashboard
+- Review pending policy applications
+- Approve or reject applications with comments
+- View application details
+- Track application status
 
+### 👨‍💻 Senior Admin Dashboard
+- Review applications approved by Junior Admin
+- Final approval or rejection with comments
+- Assign application numbers to approved policies
+- Complete workflow management
 
-## Installation
+## Workflow
 
-1. Clone the repo: git clone https://github.com/abhideole17/CattleInsurance/
-2. Navigate into the folder: cd CattleInsurance/cd frontend
-5. Install dependencies: npm install
-6. Start the app: npm start
+1. **Farmer Registration & Policy Application**
+   - Farmer registers and logs in
+   - Submits policy application for their cattle
+   - Application goes to "PENDING" status
 
+2. **Junior Admin Review**
+   - Junior Admin reviews pending applications
+   - Can approve (moves to "JUNIOR_APPROVED") or reject (moves to "REJECTED")
+   - Must provide comments for decisions
 
-## Usage
+3. **Senior Admin Final Review**
+   - Senior Admin reviews Junior Admin approved applications
+   - Can approve (moves to "APPROVED") or reject (moves to "REJECTED")
+   - Approved applications get application numbers assigned
 
-- Register as a farmer.
-- Log in as a farmer.
-- Add a new cattle policy.
-- Track claims raised by farmers.
+## Technology Stack
 
-  ## Features
+### Frontend
+- **React 19.1.0** - Modern React with hooks
+- **React Router DOM** - Client-side routing
+- **Axios** - HTTP client for API calls
+- **CSS3** - Modern styling with gradients and animations
 
-- ✅ Farmer login and registration
-- 📄 Policy creation and approval
-- 🔍 Real-time claim tracking
-- 📱 Mobile-responsive interface
+### Backend
+- **Spring Boot** - Java-based REST API
+- **Spring Data JPA** - Database operations
+- **H2 Database** - In-memory database (can be changed to MySQL/PostgreSQL)
+- **Maven** - Dependency management
 
+## Database Schema
 
-## Screenshots
+### Core Entities
+- **User Role**: role_id, name (Farmer, Junior Admin, Senior Admin)
+- **User**: user_id, role_id, username, address_id, contact_no, email, password_hash, cattle_id, gender
+- **Address**: address_id, address_street, address_city, address_pin_code, address_state, region_id
+- **Region**: region_id, region_name, description
+- **Cattle**: cattle_tag, user_id, cattle_type, breed, policy_id, birth_date, gender
+- **Policy Main**: policy_id, policy_name, description, premium_amount, coverage_amount, duration_months
+- **Policy**: application_id, user_id, status_id, junior_admin_id, senior_admin_id, policy_id, cattle_id, premium_amount, coverage_amount, comments, created_at, updated_at
+- **Status**: status_id, status_name
+- **Action**: action_id, action_name
+- **Audit Logs**: log_id, application_id, action_by, action_id, role_id, timestamp, details
+- **Document**: document_id, document_name, application_id, file_path, file_type, file_size, upload_date
 
-### LOGIN PAGE
-<img width="1920" height="937" alt="image" src="https://github.com/user-attachments/assets/b32030ac-c8fe-431c-af43-5856a2bc6c82" />
+## Getting Started
 
-### REGISTRATION PAGE
-<img width="1856" height="1062" alt="image" src="https://github.com/user-attachments/assets/bc42ac12-a677-4c77-b00a-866f2670810b" />
+### Prerequisites
+- Node.js (v16 or higher)
+- Java 17 or higher
+- Maven 3.6 or higher
 
-### FARMER DASHBOARD
-<img width="1903" height="1080" alt="image" src="https://github.com/user-attachments/assets/4048c119-6f9a-446f-adc4-156c3d698526" />
+### Frontend Setup
+```bash
+cd frontend
+npm install
+npm start
+```
 
-<img width="1920" height="920" alt="image" src="https://github.com/user-attachments/assets/2808366b-da65-4bce-887b-f658cc5eac40" />
+The React app will run on `http://localhost:3000`
 
-<img width="1920" height="869" alt="image" src="https://github.com/user-attachments/assets/9984821c-5e4f-4e4c-9f83-cfe7ab6f99a4" />
+### Backend Setup
+```bash
+cd backend/CattleInsurance
+mvn spring-boot:run
+```
 
-<img width="1920" height="933" alt="image" src="https://github.com/user-attachments/assets/0cdaf213-bd13-4751-9c11-9f1dad5505ae" />
+The Spring Boot API will run on `http://localhost:8080`
 
-<img width="1883" height="1080" alt="image" src="https://github.com/user-attachments/assets/c9fdd0e7-daa5-4fca-8003-e65e64584f92" />
+## API Endpoints
 
-<img width="1897" height="1067" alt="image" src="https://github.com/user-attachments/assets/7e004661-d48d-46fb-bf6f-a8ace0b05b90" />
+### Authentication
+- `POST /api/auth/login` - User login
+
+### Policy Management
+- `GET /api/policies/pending-junior` - Get pending applications for Junior Admin
+- `GET /api/policies/pending-senior` - Get pending applications for Senior Admin
+- `POST /api/policies/apply` - Submit new policy application
+- `POST /api/policies/{id}/junior-approve` - Junior Admin approval
+- `POST /api/policies/{id}/junior-reject` - Junior Admin rejection
+- `POST /api/policies/{id}/senior-approve` - Senior Admin approval
+- `POST /api/policies/{id}/senior-reject` - Senior Admin rejection
+
+## Usage Instructions
+
+### For Farmers
+1. Login with your credentials
+2. Navigate to "Apply for Policy" in the dashboard
+3. Fill in the required information:
+   - Policy ID
+   - Cattle ID
+   - Premium Amount
+   - Coverage Amount
+4. Submit the application
+5. Track your application status
+
+### For Junior Admins
+1. Login with username: `juniorAdmin`, password: `Junior@12345`
+2. View pending applications in the dashboard
+3. Click "Review Application" for any application
+4. Add comments and approve or reject
+5. Applications move to Senior Admin if approved
+
+### For Senior Admins
+1. Login with username: `seniorAdmin`, password: `Senior@12345`
+2. View applications approved by Junior Admin
+3. Review application details and Junior Admin comments
+4. Add final comments and approve or reject
+5. Approved applications get application numbers
+
+## Status Flow
+
+```
+PENDING → JUNIOR_APPROVED → APPROVED
+    ↓           ↓
+REJECTED    REJECTED
+```
+
+## Security Features
+
+- Role-based access control
+- Password hashing (implemented in backend)
+- Session management
+- Input validation
+- CORS configuration
+
+## Future Enhancements
+
+- Email notifications
+- Document upload functionality
+- Payment integration
+- Mobile app development
+- Advanced reporting and analytics
+- Multi-language support
+- SMS notifications
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For support and questions, please contact the development team.
 
 
 

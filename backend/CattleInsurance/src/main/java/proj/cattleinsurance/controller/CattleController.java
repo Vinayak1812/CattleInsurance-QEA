@@ -29,10 +29,10 @@ public class CattleController {
         }
     }
     
-    // Get cattle by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Cattle> getCattleById(@PathVariable("id") Long id) {
-        Optional<Cattle> cattleData = cattleRepository.findById(id);
+    // Get cattle by tag
+    @GetMapping("/{cattleTag}")
+    public ResponseEntity<Cattle> getCattleByTag(@PathVariable("cattleTag") String cattleTag) {
+        Optional<Cattle> cattleData = cattleRepository.findById(cattleTag);
         
         if (cattleData.isPresent()) {
             return new ResponseEntity<>(cattleData.get(), HttpStatus.OK);
@@ -42,10 +42,10 @@ public class CattleController {
     }
     
     // Get cattle by owner ID
-    @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<Cattle>> getCattleByOwnerId(@PathVariable("ownerId") Long ownerId) {
+    @GetMapping("/owner/{userId}")
+    public ResponseEntity<List<Cattle>> getCattleByUserId(@PathVariable("userId") Long userId) {
         try {
-            List<Cattle> cattleList = cattleRepository.findByOwnerId(ownerId);
+            List<Cattle> cattleList = cattleRepository.findByUserId(userId);
             return new ResponseEntity<>(cattleList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -53,9 +53,9 @@ public class CattleController {
     }
     
     // Get cattle by tag number
-    @GetMapping("/tag/{tagNumber}")
-    public ResponseEntity<Cattle> getCattleByTagNumber(@PathVariable("tagNumber") String tagNumber) {
-        Optional<Cattle> cattleData = cattleRepository.findByTagNumber(tagNumber);
+    @GetMapping("/tag/{cattleTag}")
+    public ResponseEntity<Cattle> getCattleByTagNumber(@PathVariable("cattleTag") String cattleTag) {
+        Optional<Cattle> cattleData = cattleRepository.findByCattleTag(cattleTag);
         
         if (cattleData.isPresent()) {
             return new ResponseEntity<>(cattleData.get(), HttpStatus.OK);
@@ -76,20 +76,19 @@ public class CattleController {
     }
     
     // Update cattle
-    @PutMapping("/{id}")
-    public ResponseEntity<Cattle> updateCattle(@PathVariable("id") Long id, @RequestBody Cattle cattle) {
-        Optional<Cattle> cattleData = cattleRepository.findById(id);
+    @PutMapping("/{cattleTag}")
+    public ResponseEntity<Cattle> updateCattle(@PathVariable("cattleTag") String cattleTag, @RequestBody Cattle cattle) {
+        Optional<Cattle> cattleData = cattleRepository.findById(cattleTag);
         
         if (cattleData.isPresent()) {
             Cattle _cattle = cattleData.get();
-            _cattle.setTagNumber(cattle.getTagNumber());
+            _cattle.setCattleTag(cattle.getCattleTag());
+            _cattle.setUserId(cattle.getUserId());
+            _cattle.setCattleType(cattle.getCattleType());
             _cattle.setBreed(cattle.getBreed());
+            _cattle.setPolicyId(cattle.getPolicyId());
             _cattle.setBirthDate(cattle.getBirthDate());
             _cattle.setGender(cattle.getGender());
-            _cattle.setWeight(cattle.getWeight());
-            _cattle.setValue(cattle.getValue());
-            _cattle.setOwnerId(cattle.getOwnerId());
-            _cattle.setStatus(cattle.getStatus());
             
             return new ResponseEntity<>(cattleRepository.save(_cattle), HttpStatus.OK);
         } else {
@@ -98,10 +97,10 @@ public class CattleController {
     }
     
     // Delete cattle
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteCattle(@PathVariable("id") Long id) {
+    @DeleteMapping("/{cattleTag}")
+    public ResponseEntity<HttpStatus> deleteCattle(@PathVariable("cattleTag") String cattleTag) {
         try {
-            cattleRepository.deleteById(id);
+            cattleRepository.deleteById(cattleTag);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

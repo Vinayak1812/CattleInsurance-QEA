@@ -6,9 +6,11 @@ import FileClaim from './dashboard/FileClaim';
 import InsurancePlans from './dashboard/InsurancePlans';
 import Notifications from './dashboard/Notifications';
 import DashboardSummary from './dashboard/DashboardSummary';
+import PolicyApplicationForm from './dashboard/PolicyApplicationForm';
 
-const Dashboard = ({ onLogout }) => {
+const Dashboard = ({ onLogout, user }) => {
   const [activeTab, setActiveTab] = useState('summary');
+  const [showPolicyForm, setShowPolicyForm] = useState(false);
 
   const handleLogout = () => {
     if (onLogout) {
@@ -41,7 +43,7 @@ const Dashboard = ({ onLogout }) => {
       <header className="dashboard-header">
         <div className="header-left">
           <h1>🐄 Farmer Dashboard</h1>
-          <p>Welcome back, Farmer!</p>
+          <p>Welcome back, {user?.username || 'Farmer'}!</p>
         </div>
         <div className="header-right">
           <button className="notification-btn">
@@ -97,6 +99,12 @@ const Dashboard = ({ onLogout }) => {
           📦 Insurance Plans
         </button>
         <button 
+          className="nav-item apply-policy-btn"
+          onClick={() => setShowPolicyForm(true)}
+        >
+          📝 Apply for Policy
+        </button>
+        <button 
           className={`nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
           onClick={() => setActiveTab('notifications')}
         >
@@ -108,6 +116,17 @@ const Dashboard = ({ onLogout }) => {
       <main className="dashboard-main">
         {renderContent()}
       </main>
+
+      {/* Policy Application Form Modal */}
+      {showPolicyForm && (
+        <PolicyApplicationForm
+          onClose={() => setShowPolicyForm(false)}
+          onSuccess={() => {
+            // Refresh policies or show success message
+            console.log('Policy application submitted successfully');
+          }}
+        />
+      )}
     </div>
   );
 };
